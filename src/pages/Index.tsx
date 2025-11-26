@@ -25,20 +25,7 @@ const Index = () => {
     });
 
     try {
-      // Simular metadatos (en producción vendría de la API o input del usuario)
-      const metadata = {
-        titulo: "Dataset de Datos Abiertos",
-        descripcion: "Conjunto de datos públicos para análisis de calidad",
-        fechaActualizacion: new Date(),
-        frecuenciaActualizacion: 30,
-        fuente: "datos.gov.co",
-        publicador: "Gobierno de Colombia",
-        contacto: "datos@gov.co",
-        etiquetas: ["datos abiertos", "gobierno", "transparencia"],
-        vinculo: url
-      };
-
-      const results = await evaluarCalidadDataset(url, metadata);
+      const results = await evaluarCalidadDataset(url);
       
       setState({
         loading: false,
