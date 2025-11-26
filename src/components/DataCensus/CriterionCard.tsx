@@ -1,62 +1,91 @@
 import { motion } from "framer-motion";
-import { ScoreGauge } from "./ScoreGauge";
-import { LucideIcon } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 interface CriterionCardProps {
   title: string;
+  value: number | undefined; // Cambiado para aceptar undefined
   description: string;
-  score: number;
-  icon: LucideIcon;
+  tooltipContent: string;
+  color: "green" | "yellow" | "red" | "blue";
   delay?: number;
 }
 
+const colorMap = {
+  green: "from-green-500/10 to-green-600/10 border-green-200",
+  yellow: "from-yellow-500/10 to-yellow-600/10 border-yellow-200", 
+  red: "from-red-500/10 to-red-600/10 border-red-200",
+  blue: "from-blue-500/10 to-blue-600/10 border-blue-200"
+};
+
+const badgeColorMap = {
+  green: "bg-green-100 text-green-800 hover:bg-green-200",
+  yellow: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
+  red: "bg-red-100 text-red-800 hover:bg-red-200",
+  blue: "bg-blue-100 text-blue-800 hover:bg-blue-200"
+};
+
 export const CriterionCard = ({
   title,
+  value,
   description,
-  score,
-  icon: Icon,
+  tooltipContent,
+  color,
   delay = 0
 }: CriterionCardProps) => {
-  const getScoreLabel = (value: number) => {
-    if (value >= 8) return { label: "Excelente", color: "text-accent" };
-    if (value >= 6) return { label: "Bueno", color: "text-chart-3" };
-    if (value >= 4) return { label: "Aceptable", color: "text-warning" };
-    return { label: "Deficiente", color: "text-destructive" };
+  // Manejar valores undefined o null
+  const displayValue = value ?? 0; // Si es undefined o null, usar 0
+  const displayText = typeof displayValue === 'number' ? displayValue.toFixed(1) : '0.0';
+
+  // Determinar el color basado en el valor
+  const getScoreColor = (score: number) => {
+    if (score >= 8) return "green";
+    if (score >= 6) return "yellow";
+    if (score >= 4) return "blue";
+    return "red";
   };
 
-  const scoreInfo = getScoreLabel(score);
+  const scoreColor = getScoreColor(displayValue);
+  const currentColor = color || scoreColor;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.3 }}
-      className="bg-card border border-border rounded-lg p-5 hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/5"
+      transition={{ duration: 0.5, delay }}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <Icon className="w-4 h-4 text-primary" />
-            <h3 className="font-semibold text-foreground text-sm">{title}</h3>
+      <Card className={`bg-gradient-to-br ${colorMap[currentColor]} border backdrop-blur-sm`}>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+          <CardTitle className="text-sm font-medium text-foreground">
+            {title}
+          </CardTitle>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p>{tooltipContent}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Badge variant="secondary" className={badgeColorMap[currentColor]}>
+              {displayText}/10
+            </Badge>
+            <div className="text-2xl font-bold text-foreground">
+              {displayText}
+            </div>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
             {description}
           </p>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between pt-4 border-t border-border/50">
-        <div>
-          <div className={`text-xs font-semibold ${scoreInfo.color}`}>
-            {scoreInfo.label}
-          </div>
-          <div className="text-2xl font-bold font-mono text-foreground">
-            {score.toFixed(1)}
-            <span className="text-sm text-muted-foreground ml-1">/10</span>
-          </div>
-        </div>
-        <ScoreGauge score={score} size="sm" showLabel={false} />
-      </div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 };
