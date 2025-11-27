@@ -70,14 +70,17 @@ export const SearchAgentSection = () => {
                 <button
                   onClick={handleSearch}
                   disabled={isLoading || !query.trim()}
-                  className="bg-gradient-to-r from-[#2962FF] to-[#1E4ED8] hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 text-white px-6 gap-2 h-12 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
+                  aria-label={isLoading ? "Buscando" : "Buscar"}
+                  className="bg-gradient-to-r from-[#2962FF] to-[#1E4ED8] hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20 text-white px-3 sm:px-6 gap-2 h-12 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center"
                 >
                   {isLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <ArrowRight className="w-4 h-4" />
                   )}
-                  {isLoading ? "Buscando..." : "Buscar"}
+                  <span className="hidden sm:inline">
+                    {isLoading ? "Buscando..." : "Buscar"}
+                  </span>
                 </button>
               </div>
 
