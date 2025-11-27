@@ -499,7 +499,7 @@ const Index = () => {
       <footer className="border-t border-gray-100 bg-white/50 backdrop-blur-md py-8 mt-20">
         <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
           <p className="text-sm text-gray-600 mb-2">
-            DataCensus © 2024 • Plataforma de Evaluación de Calidad de Datos
+            DataCensus © 2025 • Plataforma de Evaluación de Calidad de Datos
           </p>
           <p className="text-xs text-gray-500">
             Basado en estándares ISO/IEC 25012 • Ministerio de Tecnologías de la Información y Comunicaciones
