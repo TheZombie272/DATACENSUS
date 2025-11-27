@@ -1,3 +1,4 @@
+import React from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +11,7 @@ interface CriterionCardProps {
   description: string;
   tooltipContent: string;
   color: "green" | "yellow" | "red" | "blue";
+  extra?: React.ReactNode;
   delay?: number;
 }
 
@@ -33,6 +35,7 @@ export const CriterionCard = ({
   description,
   tooltipContent,
   color,
+  extra,
   delay = 0
 }: CriterionCardProps) => {
   // Manejar valores undefined o null
@@ -84,6 +87,9 @@ export const CriterionCard = ({
           <p className="text-xs text-muted-foreground leading-relaxed">
             {description}
           </p>
+          {extra && (
+            <div className="text-sm text-gray-500 mt-2">{extra}</div>
+          )}
         </CardContent>
       </Card>
     </motion.div>

@@ -18,6 +18,8 @@ export interface QualityResults {
   recuperabilidad: number;
   disponibilidad: number;
   promedioGeneral: number;
+  details?: Record<string, any>;
+  [key: string]: any;
 }
 
 export interface DatasetMetadata {

@@ -14,9 +14,7 @@ const API_BASE_URL = "http://localhost:8001";
 
 const CRITERIA_ENDPOINTS = [
   "actualidad",
-  "confidencialidad",
-  "completitud",
-  "unicidad"
+  "confidencialidad"
 ];
 
 const Index = () => {
@@ -36,8 +34,6 @@ const Index = () => {
   }>({});
   const [datasetInput, setDatasetInput] = useState("8dbv-wsjq");
   const [analysisStarted, setAnalysisStarted] = useState(false);
-  const [isLoadingCompletitud, setIsLoadingCompletitud] = useState(false);
-  const [isLoadingUnicidad, setIsLoadingUnicidad] = useState(false);
 
   // Verificar si el servidor está activo
   const checkServerStatus = async (): Promise<boolean> => {
@@ -107,81 +103,6 @@ const Index = () => {
     }
   };
 
-  const loadDatasetRecords = async (datasetId: string): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
-
-    toast.info("Cargando registros del dataset...", {
-      description: `Solicitando registros para ID: ${datasetId}`
-    });
-
-    try {
-      const resp = await fetch(`${API_BASE_URL}/load_data`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dataset_id: datasetId })
-      });
-
-      if (!resp.ok) {
-        const err = await resp.json().catch(() => ({}));
-        throw new Error(err.detail || resp.statusText || "Error al cargar registros");
-      }
-
-      // backend should have loaded the data into memory for subsequent GET /completitud
-      setLoading(false);
-      toast.success("Registros cargados");
-      return true;
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Error al cargar registros";
-      setError(msg);
-      setLoading(false);
-      toast.error("Error al cargar registros", { description: msg });
-      return false;
-    }
-  };
-
-  const fetchFastMetrics = async () => {
-    // Fetch actualidad, confidencialidad, and unicidad (fast endpoints)
-    const fastEndpoints = ["actualidad", "confidencialidad", "unicidad"];
-    try {
-      const promises = fastEndpoints.map(async (criterion) => {
-        const response = await fetch(`${API_BASE_URL}/${criterion}?dataset_id=${datasetInput}`);
-        if (!response.ok) {
-          throw new Error(`Error al obtener ${criterion}: ${response.statusText}`);
-        }
-        const data = await response.json();
-        return { criterion, value: data.score || 0, details: data.details || null };
-      });
-
-      const metricsArray = await Promise.all(promises);
-      console.log("Métricas rápidas obtenidas:", metricsArray);
-
-      return metricsArray;
-    } catch (error) {
-      console.error("Error fetching fast metrics:", error);
-      throw error;
-    }
-  };
-
-  const fetchCompletitudMetric = async () => {
-    // Fetch completitud separately (slow endpoint)
-    setIsLoadingCompletitud(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/completitud?dataset_id=${datasetInput}`);
-      if (!response.ok) {
-        throw new Error(`Error al obtener completitud: ${response.statusText}`);
-      }
-      const data = await response.json();
-      console.log("Completitud obtenida:", data);
-      return { criterion: "completitud", value: data.score || 0, details: data.details || null };
-    } catch (error) {
-      console.error("Error fetching completitud:", error);
-      throw error;
-    } finally {
-      setIsLoadingCompletitud(false);
-    }
-  };
-
   const fetchAllMetrics = async () => {
     setLoading(true);
     setError(null);
@@ -191,54 +112,35 @@ const Index = () => {
     });
 
     try {
-      // Fetch fast metrics first and show immediately
-      const fastMetrics = await fetchFastMetrics();
-
-      const metricsObj: any = { details: {} };
-      fastMetrics.forEach(({ criterion, value, details }) => {
-        metricsObj[criterion] = value;
-        metricsObj.details[criterion] = details ?? null;
+      const promises = CRITERIA_ENDPOINTS.map(async (criterion) => {
+        const response = await fetch(`${API_BASE_URL}/${criterion}?dataset_id=${datasetInput}`);
+        if (!response.ok) {
+          throw new Error(`Error al obtener ${criterion}: ${response.statusText}`);
+        }
+        const data = await response.json();
+        return { criterion, value: data.score || 0 };
       });
 
-      // Calculate initial average with fast metrics (actualidad, confidencialidad, unicidad)
-      const fastAverage = fastMetrics.reduce((sum, m) => sum + m.value, 0) / fastMetrics.length;
+      const metricsArray = await Promise.all(promises);
 
-      // Set results with fast metrics only (completitud will be undefined/loading)
-      metricsObj.completitud = undefined; // Placeholder while loading
-      metricsObj.details.completitud = null;
-      metricsObj.promedioGeneral = fastAverage;
+      console.log("Métricas obtenidas del backend:", metricsArray);
+
+      const metricsObj: any = {};
+      metricsArray.forEach(({ criterion, value }) => {
+        metricsObj[criterion] = value;
+      });
+
+      const promedio = metricsArray.length > 0 ? metricsArray.reduce((sum, m) => sum + m.value, 0) / metricsArray.length : 0;
+      metricsObj.promedioGeneral = promedio;
+
+      console.log("Objeto final de métricas:", metricsObj);
+
       setResults(metricsObj as QualityResults);
       setLoading(false);
-      toast.success("Métricas rápidas cargadas");
 
-      // Fetch completitud in background without blocking UI
-      fetchCompletitudMetric()
-        .then((completitudData) => {
-          setResults((prev) => {
-            if (!prev) return prev;
-            const updated = { ...prev };
-            updated.completitud = completitudData.value;
-            updated.details = { ...prev.details, completitud: completitudData.details ?? null };
-            // Recalculate average including completitud
-            const metrics = [
-              updated.actualidad,
-              updated.confidencialidad,
-              updated.unicidad,
-              updated.completitud
-            ].filter((m) => m !== undefined && m !== null);
-            updated.promedioGeneral = metrics.length > 0 ? metrics.reduce((s, m) => s + m, 0) / metrics.length : 0;
-            return updated;
-          });
-          toast.success("Completitud calculada", {
-            description: "Análisis completado ✓"
-          });
-        })
-        .catch((error) => {
-          console.error("Error fetching completitud in background:", error);
-          toast.error("Error al calcular Completitud", {
-            description: error instanceof Error ? error.message : "Intenta de nuevo"
-          });
-        });
+      toast.success("Análisis completado", {
+        description: `📊 Puntuación promedio: ${promedio.toFixed(1)}/10`
+      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Error al conectar con el servidor";
       setError(errorMessage);
@@ -261,12 +163,9 @@ const Index = () => {
     const initialized = await initializeDataset(datasetInput);
 
     if (initialized) {
-      // After initialization, request backend to load full data (POST /load_data)
-      const loaded = await loadDatasetRecords(datasetInput);
-      if (loaded) {
-        // slight delay to allow backend to finish any processing
-        setTimeout(() => fetchAllMetrics(), 300);
-      }
+      setTimeout(() => {
+        fetchAllMetrics();
+      }, 500);
     }
   };
 
@@ -353,7 +252,7 @@ const Index = () => {
                         onChange={(e) => setDatasetInput(e.target.value)}
                         disabled={initializing || loading}
                         placeholder="ej: 8dbv-wsjq"
-                        className="flex-1 px-4 py-3 border-2 border-gray-200 bg-white rounded-lg focus:border-[#2962FF] focus:ring-2 focus:ring-[#2962FF]/20 focus:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-400 font-medium"
+                        className="flex-1 px-4 py-3 border-0 bg-gray-50/50 rounded-lg focus:ring-2 focus:ring-[#2962FF]/20 focus:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-500"
                       />
                       <button
                         onClick={handleAnalyze}
