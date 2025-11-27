@@ -281,17 +281,26 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
-      <Header currentSection={currentSection} onSectionChange={setCurrentSection} datasetId={datasetInput} onDatasetIdChange={setDatasetInput} />
+      <Header currentSection={currentSection} onSectionChange={setCurrentSection} datasetId={datasetInput} onDatasetIdChange={setDatasetInput} onDatasetSubmit={handleAnalyze} />
 
       <main className="pt-24 pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-        <AnimatePresence mode="wait">
-          {/* SECTION 1: ANÁLISIS POR ID */}
-          {currentSection === "metrics" && (
+        {/* AGENTE DE BÚSQUEDA - se muestra primero */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-10"
+        >
+          <SearchAgentSection />
+        </motion.div>
+
+        {/* ANALÍTICA POR ID - mostrado debajo (puede colocarse lado a lado en pantallas grandes) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+          <div className="col-span-1">
             <motion.div
-              key="metrics-section"
+              id="analytics-by-id"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4 }}
               className="space-y-8"
             >
@@ -300,7 +309,6 @@ const Index = () => {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.4 }}
                 >
                   <Card className="border-0 shadow-lg shadow-blue-500/5 bg-gradient-to-br from-white to-blue-50/30 overflow-hidden">
@@ -461,34 +469,30 @@ const Index = () => {
                 </motion.div>
               )}
             </motion.div>
-          )}
+          </div>
 
-          {/* SECTION 2: AGENTE DE BÚSQUEDA */}
-          {currentSection === "search" && (
-            <motion.div
-              key="search-section"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-            >
-              <SearchAgentSection />
-            </motion.div>
-          )}
+          {/* Columna derecha: espacio para contenido relacionado (por ejemplo resultados rápidos o controles adicionales) */}
+          <div className="col-span-1">
+            {/* Actualmente dejamos este espacio para información adicional o future components */}
+            <div className="space-y-4">
+              <Card className="p-6 border-0 shadow-lg shadow-blue-500/5 bg-white">
+                <CardContent>
+                  <h3 className="text-lg font-bold mb-2">Acciones Rápidas</h3>
+                  <p className="text-sm text-gray-600">Aquí puedes agregar widgets relacionados con la búsqueda o filtros por ID.</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
 
-          {/* SECTION 3: MÉTRICAS GLOBALES */}
-          {currentSection === "global" && (
-            <motion.div
-              key="global-section"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-            >
-              <GlobalMetricsSection />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* MÉTRICAS GLOBALES - abajo */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <GlobalMetricsSection />
+        </motion.div>
       </main>
 
       {/* Footer */}
