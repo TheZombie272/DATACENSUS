@@ -60,19 +60,6 @@ export const GlobalMetricsSection = () => {
 
   return (
     <div className="space-y-12">
-      {/* Main Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          Métricas de Calidad de Datos
-        </h1>
-        <p className="text-lg text-gray-600">
-          Visión consolidada del ecosistema de datos en Colombia
-        </p>
-      </motion.div>
 
       {/* Backend Global Metrics Section */}
       <BackendGlobalMetrics />
