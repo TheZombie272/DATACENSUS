@@ -285,68 +285,29 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white">
-      <Header currentSection={currentSection} onSectionChange={setCurrentSection} datasetId={datasetInput} onDatasetIdChange={setDatasetInput} onDatasetSubmit={handleAnalyze} />
+      <Header currentSection={currentSection} onSectionChange={setCurrentSection} />
 
-      <main className="pt-24 pb-20 px-4 md:px-6 max-w-7xl mx-auto">
-        {/* AGENTE DE BÚSQUEDA - se muestra primero */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mb-10"
-        >
-          <SearchAgentSection />
-        </motion.div>
-
-        {/* ANALÍTICA POR ID - mostrado debajo (puede colocarse lado a lado en pantallas grandes) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-          <div className="col-span-1">
+      <main className="pt-6 pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+        <AnimatePresence mode="wait">
+          {/* SECCIÓN 1: ANÁLISIS POR ID */}
+          {currentSection === "metrics" && (
             <motion.div
-              id="analytics-by-id"
+              key="metrics-section"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4 }}
               className="space-y-8"
             >
-              {/* Intro Card - Diseño Moderno */}
-              {!analysisStarted && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <Card className="border-0 shadow-lg shadow-blue-500/5 bg-gradient-to-br from-white to-blue-50/30 overflow-hidden">
-                    <CardContent className="p-8 md:p-12">
-                      <div className="flex flex-col md:flex-row items-center gap-8">
-                        <div className="flex-shrink-0">
-                          <div className="w-16 h-16 bg-gradient-to-br from-[#2962FF] to-[#1E4ED8] rounded-xl flex items-center justify-center">
-                            <Database className="w-8 h-8 text-white" />
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                            Análisis de Calidad de Datos
-                          </h2>
-                          <p className="text-gray-600 text-lg mb-4">
-                            Evalúa la calidad integral de tus datasets usando estándares internacionales ISO/IEC 25012
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            <span className="px-3 py-1 bg-blue-50 text-[#2962FF] rounded-full text-sm font-medium">
-                              ✓ Actualidad
-                            </span>
-                            <span className="px-3 py-1 bg-blue-50 text-[#2962FF] rounded-full text-sm font-medium">
-                              ✓ Confidencialidad
-                            </span>
-                            <span className="px-3 py-1 bg-blue-50 text-[#2962FF] rounded-full text-sm font-medium">
-                              + Más métricas
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
+              {/* Header de Sección */}
+              <div className="mb-8">
+                <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                  Análisis de Calidad por ID
+                </h1>
+                <p className="text-lg text-gray-600">
+                  Ingresa el ID de un dataset para evaluar su calidad usando estándares ISO/IEC 25012
+                </p>
+              </div>
 
               {/* Input Section - Diseño Moderno */}
               <motion.div
@@ -363,6 +324,11 @@ const Index = () => {
                         type="text"
                         value={datasetInput}
                         onChange={(e) => setDatasetInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !initializing && !loading && datasetInput.trim()) {
+                            handleAnalyze();
+                          }
+                        }}
                         disabled={initializing || loading}
                         placeholder="ej: 8dbv-wsjq"
                         className="flex-1 px-4 py-3 border-2 border-gray-200 bg-white rounded-lg focus:border-[#2962FF] focus:ring-2 focus:ring-[#2962FF]/20 focus:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 placeholder-gray-400 font-medium"
@@ -384,6 +350,9 @@ const Index = () => {
                         )}
                       </button>
                     </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Encuentra IDs en <strong>datos.gov.co</strong>
+                    </p>
                   </div>
 
                   {/* Info Badges */}
@@ -473,30 +442,34 @@ const Index = () => {
                 </motion.div>
               )}
             </motion.div>
-          </div>
+          )}
 
-          {/* Columna derecha: espacio para contenido relacionado (por ejemplo resultados rápidos o controles adicionales) */}
-          <div className="col-span-1">
-            {/* Actualmente dejamos este espacio para información adicional o future components */}
-            <div className="space-y-4">
-              <Card className="p-6 border-0 shadow-lg shadow-blue-500/5 bg-white">
-                <CardContent>
-                  <h3 className="text-lg font-bold mb-2">Acciones Rápidas</h3>
-                  <p className="text-sm text-gray-600">Aquí puedes agregar widgets relacionados con la búsqueda o filtros por ID.</p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
+          {/* SECCIÓN 2: AGENTE DE IA */}
+          {currentSection === "search" && (
+            <motion.div
+              key="search-section"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+            >
+              <SearchAgentSection />
+            </motion.div>
+          )}
 
-        {/* MÉTRICAS GLOBALES - abajo */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <GlobalMetricsSection />
-        </motion.div>
+          {/* SECCIÓN 3: MÉTRICAS GENERALES */}
+          {currentSection === "global" && (
+            <motion.div
+              key="global-section"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+            >
+              <GlobalMetricsSection />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
       {/* Footer */}
