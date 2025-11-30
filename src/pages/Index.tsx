@@ -274,11 +274,7 @@ const Index = () => {
     }
   };
 
-<<<<<<< HEAD
-  const fetchFastMetrics = async () => {
-=======
   const fetchFastMetrics = async (datasetId?: string) => {
->>>>>>> 7f9ab95 (feat: Enhance Header and SearchAgentSection with new "About" functionality and improved user experience)
     // Fetch actualidad, confidencialidad, unicidad, accesibilidad, conformidad, portabilidad, disponibilidad, trazabilidad, credibilidad and recuperabilidad (fast endpoints)
     const fastEndpoints = ["actualidad", "confidencialidad", "unicidad", "accesibilidad", "conformidad", "portabilidad", "disponibilidad", "trazabilidad", "credibilidad", "recuperabilidad"];
     try {

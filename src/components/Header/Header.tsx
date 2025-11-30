@@ -4,10 +4,7 @@ import { motion } from "framer-motion";
 interface HeaderProps {
   currentSection: "metrics" | "search" | "global" | "about";
   onSectionChange: (section: "metrics" | "search" | "global" | "about") => void;
-<<<<<<< HEAD
-=======
   isEmbedded?: boolean;
->>>>>>> 7f9ab95 (feat: Enhance Header and SearchAgentSection with new "About" functionality and improved user experience)
 }
 
 export const Header = ({
