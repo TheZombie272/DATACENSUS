@@ -18,6 +18,11 @@ export const DEFAULT_DATASET_ID = import.meta.env.VITE_DEFAULT_DATASET_ID || "8d
 // Repositories
 export const GITHUB_FRONTEND_REPO = import.meta.env.VITE_GITHUB_FRONTEND_REPO || "https://github.com/valentinagn13/DATACENSUS";
 export const GITHUB_BACKEND_REPO = import.meta.env.VITE_GITHUB_BACKEND_REPO || "https://github.com/valentinagn13/Mini_backend_metricas";
+export const GITHUB_MAIN_BACKEND_REPO = import.meta.env.VITE_GITHUB_MAIN_BACKEND_REPO || "https://github.com/TheZombie272/Main-Backend";
+
+// Documentation Links
+export const USER_MANUAL_LINK = import.meta.env.VITE_USER_MANUAL_LINK || "https://docs.google.com/document/d/1MhOERYRkKG2ERk4ISDo3gqmKA-FDS7gKQJUv6HqcSFg/edit?usp=sharing";
+export const TECHNICAL_DOCUMENTATION_LINK = import.meta.env.VITE_TECHNICAL_DOCUMENTATION_LINK || "https://docs.google.com/document/d/1qEvWo74gP4cOPWK4S6M54QXVtrkc_UbAqIbCLUo3VI4/edit?usp=sharing";
 
 // Application Info
 export const APP_NAME = import.meta.env.VITE_APP_NAME || "DataCensus";
