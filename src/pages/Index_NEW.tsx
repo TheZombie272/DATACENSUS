@@ -10,7 +10,7 @@ import { Header } from "@/components/Header/Header";
 import { SearchAgentSection } from "@/components/SearchAgent/SearchAgentSection";
 import { GlobalMetricsSection } from "@/components/Metrics/GlobalMetricsSection";
 
-const API_BASE_URL = "http://localhost:8001";
+const API_BASE_URL = "http://3.148.102.253:8001";
 
 const CRITERIA_ENDPOINTS = [
   "actualidad",
