@@ -23,7 +23,7 @@ cp .env.example .env
 #### Backend API Configuration
 - **`VITE_API_BASE_URL`**: URL del servidor backend
   - Valor por defecto: `http://3.148.102.253:8001`
-  - Ejemplo: `VITE_API_BASE_URL=http://localhost:8001`
+  - Ejemplo: `VITE_API_BASE_URL=http://18.117.138.231:8001`
   - Para producción: `VITE_API_BASE_URL=https://api.ejemplo.com`
 
 #### AI Agent Configuration
