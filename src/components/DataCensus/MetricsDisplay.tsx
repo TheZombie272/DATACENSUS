@@ -246,6 +246,46 @@ export const MetricsDisplay = ({
             delay={0.35}
           />
 
+          {/* Portabilidad */}
+          <CriterionCard
+            title="Portabilidad"
+            value={results.portabilidad}
+            description="Facilidad para trasladar y reutilizar datos entre sistemas"
+            tooltipContent="Evalúa si los datos y formatos permiten transferencia y uso entre diferentes entornos"
+            color="purple"
+            delay={0.37}
+          />
+
+          {/* Disponibilidad */}
+          <CriterionCard
+            title="Disponibilidad"
+            value={results.disponibilidad}
+            description="Accesibilidad temporal y garantía de disponibilidad del servicio"
+            tooltipContent="Evalúa el tiempo de disponibilidad del dataset y garantía de acceso sin interrupciones"
+            color="teal"
+            delay={0.39}
+          />
+
+          {/* Trazabilidad */}
+          <CriterionCard
+            title="Trazabilidad"
+            value={results.trazabilidad}
+            description="Capacidad de rastrear el origen y cambios de los datos"
+            tooltipContent="Evalúa la capacidad de auditar y rastrear el origen, transformaciones y cambios de los datos en el tiempo"
+            color="orange"
+            delay={0.41}
+          />
+
+          {/* Credibilidad */}
+          <CriterionCard
+            title="Credibilidad"
+            value={results.credibilidad}
+            description="Confiabilidad y autoridad de la fuente de datos"
+            tooltipContent="Evalúa la credibilidad de la fuente, reputación del publicador y confiabilidad de los datos proporcionados"
+            color="indigo"
+            delay={0.43}
+          />
+
           {/* Recuperabilidad */}
           <CriterionCard
             title="Recuperabilidad"
@@ -288,21 +328,6 @@ export const MetricsDisplay = ({
           )}
 
           {/* Otras métricas pendientes (placeholders) */}
-          {[
-            { title: "Consistencia", icon: "✓" },
-            { title: "Exactitud", icon: "🎯" },
-          ].map((metric, idx) => (
-            <Card
-              key={idx}
-              className="p-4 border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center rounded-lg"
-            >
-              <div className="text-center">
-                <div className="text-2xl mb-1">{metric.icon}</div>
-                <p className="text-xs text-gray-600 font-medium">{metric.title}</p>
-                <p className="text-xs text-gray-400">Próximamente</p>
-              </div>
-            </Card>
-          ))}
         </div>
       </motion.div>
 
