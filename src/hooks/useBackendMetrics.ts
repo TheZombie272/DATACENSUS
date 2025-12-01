@@ -9,8 +9,8 @@ import type {
 } from "@/types/backendMetrics";
 
 // Use relative URLs in development so Vite's dev-server proxy handles /api requests.
-// In production (or when VITE_API_BASE_URL is set), use that value or fallback to the ngrok URL.
-const API_BASE_URL = "http://18.117.138.231:8000";
+// In production (or when VITE_API_BASE_URL is set), use that value or fallback to the configured backend URL.
+const API_BASE_URL = "https://hackaton-mintic.duckdns.org/api1";
 
 async function fetchMetric<T>(endpoint: string): Promise<T> {
   console.log(`Fetching from: ${API_BASE_URL}${endpoint}`);
