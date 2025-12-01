@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 from typing import Dict, Any, Optional
 from pydantic import BaseModel, Field
+from fastapi.middleware.cors import CORSMiddleware
 
 
 # ============================================================================
@@ -402,6 +403,33 @@ def create_completeness_route(app_instance, get_dataset_func, get_metadata_func)
     # Crear endpoint
     create_completeness_route(app, get_dataset, get_metadata)
     """
+
+
+def enable_cors(app_instance, allow_origins: Optional[list] = None, allow_credentials: bool = True):
+    """
+    Helper para habilitar CORS en una instancia de FastAPI.
+
+    Parámetros:
+    - app_instance: instancia de `FastAPI` donde se añade el middleware
+    - allow_origins: lista de orígenes permitidos. Si es `None`, se
+      sugiere usar `["https://datacensus.site"]` (URL exacta, con https
+      y sin slash final).
+    - allow_credentials: si se permiten cookies/Authorization headers
+
+    Nota importante: si usas cookies o `Authorization` no pongas `"*"`
+    en `allow_origins`.
+    """
+
+    if allow_origins is None:
+        allow_origins = ["https://datacensus.site"]
+
+    app_instance.add_middleware(
+        CORSMiddleware,
+        allow_origins=allow_origins,
+        allow_credentials=allow_credentials,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     
     @app_instance.get("/completitud")
     async def get_completeness(dataset_id: str = None) -> CompletenessResponse:
@@ -507,3 +535,28 @@ if __name__ == "__main__":
     print(f"  Porcentaje de nulos: {resultado.details.porcentaje_celdas_nulas}%")
     print(f"  Columnas sparse (>50% nulos): {resultado.details.columnas_con_alto_porcentaje_nulos}")
     print(f"{'='*60}\n")
+
+    # ------------------------------------------------------------------
+    # Ejemplo de cómo exponer este módulo como servidor FastAPI
+    # (descomentar y adaptar `get_dataset` / `get_metadata` antes de usar)
+    # ------------------------------------------------------------------
+    # from fastapi import FastAPI
+    # import uvicorn
+    #
+    # app = FastAPI()
+    #
+    # # Añadir CORS: reemplazar por la URL exacta del frontend
+    # enable_cors(app, allow_origins=["https://datacensus.site"])  # <-- URL EXACTA
+    #
+    # # Proveer funciones que retornen el dataset y metadata por ID
+    # def get_dataset(dataset_id: str):
+    #     # lógica para obtener dataframe
+    #     return df
+    #
+    # def get_metadata(dataset_id: str):
+    #     return metadata
+    #
+    # create_completeness_route(app, get_dataset, get_metadata)
+    #
+    # # Ejecutar con:
+    # # uvicorn backend_completitud_implementation:app --host 0.0.0.0 --port 8001
