@@ -212,29 +212,43 @@ export const generatePDFReport = async (
     yPosition += 6;
   });
   
-  yPosition += 8;
-  
-  // AI Analysis Section
+  // Add more breathing room before the AI analysis section so it doesn't
+  // collide with the previous decorative box.
+  yPosition += 18;
+
+  // If we're too close to the bottom, start a new page first.
+  if (yPosition > pageHeight - 80) {
+    pdf.addPage();
+    yPosition = 20;
+  }
+
+  // Draw a subtle separator line to visually separate sections.
+  pdf.setDrawColor(...accentColor);
+  pdf.setLineWidth(0.4);
+  pdf.line(margin, yPosition - 6, pageWidth - margin, yPosition - 6);
+
+  // AI Analysis Section (title is slightly larger and bolder)
   pdf.setTextColor(...textDark);
-  pdf.setFontSize(14);
+  pdf.setFontSize(16);
   pdf.setFont("helvetica", "bold");
   pdf.text("Análisis Inteligente", margin, yPosition);
-  
-  yPosition += 8;
-  
-  pdf.setFontSize(9);
+
+  yPosition += 10;
+
+  // Body text for the analysis: slightly larger, more leading for readability.
+  pdf.setFontSize(10);
   pdf.setTextColor(...textMedium);
   pdf.setFont("helvetica", "normal");
-  
-  const lines = pdf.splitTextToSize(aiAnalysis, maxWidth - 5);
-  
+
+  const lines = pdf.splitTextToSize(aiAnalysis, maxWidth - 10);
+
   lines.forEach((line: string) => {
-    if (yPosition > pageHeight - 25) {
+    if (yPosition > pageHeight - 30) {
       pdf.addPage();
       yPosition = 20;
     }
     pdf.text(line, margin + 2, yPosition);
-    yPosition += 5;
+    yPosition += 6; // slightly larger line height
   });
   
   // Footer on all pages
