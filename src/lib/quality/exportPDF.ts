@@ -84,9 +84,16 @@ export const generatePDFReport = async (
   results: QualityResults,
   datasetName?: string,
   datasetId?: string
-): Promise<void> => {
+): Promise<{ blob: Blob; filename: string }> => {
   const metricsText = formatMetricsForAgent(results, datasetName, datasetId);
-  const aiAnalysisMarkdown = await fetchAIAnalysis(metricsText);
+  let aiAnalysisMarkdown = "";
+  try {
+    aiAnalysisMarkdown = await fetchAIAnalysis(metricsText);
+  } catch (err) {
+    // If agent times out or errors, continue generating PDF without the AI analysis
+    console.warn("No se obtuvo análisis del agente, continuando sin él:", err);
+    aiAnalysisMarkdown = "";
+  }
   const aiAnalysis = markdownToPlainText(aiAnalysisMarkdown);
 
   const pdf = new jsPDF("p", "mm", "a4");
@@ -260,9 +267,12 @@ export const generatePDFReport = async (
     );
   }
   
-  // Save PDF
+  // Prepare PDF blob and filename (do not auto-save here)
   const filename = datasetName
     ? `datacensus-${datasetName.replace(/\s+/g, '-')}-${Date.now()}.pdf`
     : `datacensus-report-${Date.now()}.pdf`;
-  pdf.save(filename);
+
+  const arrayBuffer = pdf.output("arraybuffer") as ArrayBuffer;
+  const blob = new Blob([arrayBuffer], { type: "application/pdf" });
+  return { blob, filename };
 };

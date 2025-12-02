@@ -17,6 +17,18 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
+        '/webhook/agent': {
+          target: 'https://uzuma.duckdns.org',
+          changeOrigin: true,
+          secure: true,
+          rewrite: (path) => path.replace(/^\/webhook\/agent/, '/webhook/agent'),
+        },
+        '/webhook/agent-calification': {
+          target: 'https://uzuma.duckdns.org',
+          changeOrigin: true,
+          secure: true,
+          rewrite: (path) => path.replace(/^\/webhook\/agent-calification/, '/webhook/agent-calification'),
+        },
       },
     },
     plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),

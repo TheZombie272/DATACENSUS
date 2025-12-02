@@ -29,7 +29,18 @@ export const MetricsDisplay = ({
       toast.info("Generando reporte PDF...", {
         description: "El agente está analizando las métricas"
       });
-      await generatePDFReport(results, datasetName, datasetId);
+      const { blob, filename } = await generatePDFReport(results, datasetName, datasetId);
+
+      // Force download of the returned blob
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
       toast.success("PDF generado exitosamente", {
         description: "El reporte se ha descargado"
       });
