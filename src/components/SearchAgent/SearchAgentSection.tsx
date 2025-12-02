@@ -54,7 +54,7 @@ export const SearchAgentSection = () => {
 
     // Allow longer wait time for agent response (up to 2 minutes)
     const controller = new AbortController();
-    const timeoutMs = 180000; // 120s = 2 minutes
+    const timeoutMs = 540000; // 120s = 2 minutes
     const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
 
     try {

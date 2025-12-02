@@ -35,7 +35,7 @@ const formatMetricsForAgent = (results: QualityResults, datasetName?: string, da
 
 const fetchAIAnalysis = async (metricsText: string): Promise<string> => {
   const controller = new AbortController();
-  const timeoutMs = 180000; // 180s = 3 minutes
+  const timeoutMs = 540000; // 180s = 3 minutes
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
