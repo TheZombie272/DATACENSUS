@@ -34,22 +34,38 @@ const formatMetricsForAgent = (results: QualityResults, datasetName?: string, da
 };
 
 const fetchAIAnalysis = async (metricsText: string): Promise<string> => {
-  const response = await fetch(AI_AGENT_WEBHOOK, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      userMessage: metricsText
-    }),
-  });
+  const controller = new AbortController();
+  const timeoutMs = 180000; // 180s = 3 minutes
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  if (!response.ok) {
-    throw new Error("Error al obtener análisis del agente");
+  try {
+    const response = await fetch(AI_AGENT_WEBHOOK, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userMessage: metricsText
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error("Error al obtener análisis del agente");
+    }
+
+    const data = await response.json();
+    return Array.isArray(data) && data[0]?.output ? data[0].output : "";
+  } catch (err) {
+    if ((err as any)?.name === 'AbortError') {
+      throw new Error('Timeout: el agente tardó demasiado en responder');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  const data = await response.json();
-  return Array.isArray(data) && data[0]?.output ? data[0].output : "";
 };
 
 const markdownToPlainText = (markdown: string): string => {

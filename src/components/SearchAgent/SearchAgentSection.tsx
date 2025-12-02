@@ -52,6 +52,11 @@ export const SearchAgentSection = () => {
     setMessages(prev => [...prev, { role: "user", content: userMessage }]);
     setIsLoading(true);
 
+    // Allow longer wait time for agent response (up to 2 minutes)
+    const controller = new AbortController();
+    const timeoutMs = 180000; // 120s = 2 minutes
+    const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+
     try {
       const res = await fetch(AI_AGENT_SEARCH_WEBHOOK, {
         method: "POST",
@@ -61,7 +66,10 @@ export const SearchAgentSection = () => {
         body: JSON.stringify({
           userMessage: userMessage
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!res.ok) {
         throw new Error("Error al conectar con el agente");
@@ -83,12 +91,22 @@ export const SearchAgentSection = () => {
         setMessages(prev => [...prev, { role: "assistant", content: data[0].output }]);
       }
     } catch (error) {
-      console.error("Error:", error);
-      setMessages(prev => [...prev, { 
-        role: "assistant", 
-        content: "Lo siento, hubo un error al procesar tu solicitud. Por favor intenta de nuevo." 
-      }]);
+      // Detect abort due to timeout
+      if ((error as any)?.name === 'AbortError') {
+        console.error("Agent request aborted (timeout):", error);
+        setMessages(prev => [...prev, { 
+          role: "assistant", 
+          content: "Lo siento, el agente tardó demasiado en responder (tiempo de espera agotado). Intenta de nuevo." 
+        }]);
+      } else {
+        console.error("Error:", error);
+        setMessages(prev => [...prev, { 
+          role: "assistant", 
+          content: "Lo siento, hubo un error al procesar tu solicitud. Por favor intenta de nuevo." 
+        }]);
+      }
     } finally {
+      clearTimeout(timeoutId);
       setIsLoading(false);
     }
   };
