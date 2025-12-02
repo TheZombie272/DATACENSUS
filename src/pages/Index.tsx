@@ -28,11 +28,11 @@ const Index = () => {
     try {
       const params = new URLSearchParams(window.location.search);
       const embedFlag = params.get('embed');
-      const datasetId = params.get('dataset_id');
       if (embedFlag === '1' || embedFlag === 'true') setIsEmbedded(true);
-      // If there's a dataset_id in the URL, switch to the search section so the
-      // SearchAgentSection can auto-run the query on mount.
-      if (datasetId) setCurrentSection('search');
+      // If the page is loaded with ?dataset_id=..., switch to the metrics
+      // section so the AnalysisSection can pick up the param and load it.
+      const datasetId = params.get('dataset_id');
+      if (datasetId) setCurrentSection('metrics');
     } catch (e) {
       // ignore
     }

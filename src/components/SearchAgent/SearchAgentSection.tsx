@@ -112,25 +112,8 @@ export const SearchAgentSection = () => {
     }
   };
 
-  // If the page was opened with a dataset_id query param, auto-fill and search.
-  const didAutoSearchRef = useRef(false);
-  useEffect(() => {
-    if (didAutoSearchRef.current) return;
-    didAutoSearchRef.current = true;
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const datasetId = params.get('dataset_id');
-      if (datasetId) {
-        setQuery(datasetId);
-        // Start the search on next tick to allow state to update
-        setTimeout(() => {
-          void handleSearch(datasetId);
-        }, 0);
-      }
-    } catch (e) {
-      // ignore
-    }
-  }, []);
+  // NOTE: auto-search by dataset_id removed — searches for dataset IDs
+  // should be performed from the "Análisis por ID" / AnalysisSection.
 
   const handleSuggestionClick = (suggestion: string) => {
     setQuery(suggestion);
@@ -274,7 +257,11 @@ export const SearchAgentSection = () => {
                               {ids.map((id) => (
                                 <div key={id} className="flex items-center gap-2">
                                   <button
-                                    onClick={() => setIframeDatasetId(id)}
+                                    onClick={() => {
+                                      // Navigate to the metrics view with dataset_id in the URL
+                                      // This will load the AnalysisSection and trigger the ID-based analysis.
+                                      window.location.href = `${window.location.origin}/?dataset_id=${id}`;
+                                    }}
                                     className="inline-flex items-center gap-2 px-3 py-1 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-semibold"
                                   >
                                     Ver métricas: {id}
