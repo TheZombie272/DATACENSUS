@@ -44,17 +44,18 @@ export const SearchAgentSection = () => {
     }
   }, [iframeDatasetId]);
 
-  const handleSearch = async () => {
-    if (!query.trim() || isLoading) return;
+  const handleSearch = async (message?: string) => {
+    const msg = (typeof message === 'string' ? message : query).trim();
+    if (!msg || isLoading) return;
     
-    const userMessage = query;
+    const userMessage = msg;
     setQuery("");
     setMessages(prev => [...prev, { role: "user", content: userMessage }]);
     setIsLoading(true);
 
-    // Allow longer wait time for agent response (up to 2 minutes)
+    // Allow longer wait time for agent response (up to 9 minutes)
     const controller = new AbortController();
-    const timeoutMs = 540000; // 120s = 2 minutes
+    const timeoutMs = 540000; // 540000ms = 9 minutes
     const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
 
     try {
@@ -110,6 +111,26 @@ export const SearchAgentSection = () => {
       setIsLoading(false);
     }
   };
+
+  // If the page was opened with a dataset_id query param, auto-fill and search.
+  const didAutoSearchRef = useRef(false);
+  useEffect(() => {
+    if (didAutoSearchRef.current) return;
+    didAutoSearchRef.current = true;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const datasetId = params.get('dataset_id');
+      if (datasetId) {
+        setQuery(datasetId);
+        // Start the search on next tick to allow state to update
+        setTimeout(() => {
+          void handleSearch(datasetId);
+        }, 0);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
 
   const handleSuggestionClick = (suggestion: string) => {
     setQuery(suggestion);
@@ -368,7 +389,7 @@ export const SearchAgentSection = () => {
               disabled={isLoading}
             />
             <button
-              onClick={handleSearch}
+              onClick={() => void handleSearch()}
               disabled={isLoading || !query.trim()}
               className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white px-6 rounded-2xl transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center shadow-md hover:shadow-lg hover:shadow-blue-500/20 disabled:shadow-none"
             >
