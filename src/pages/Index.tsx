@@ -36,7 +36,8 @@ const Index = () => {
       const datasetId = params.get('dataset_id');
       if (datasetId) {
         setInitialDatasetId(datasetId);
-        setCurrentSection('search');
+        // Open the metrics/AnalysisSection so it can begin analysis automatically
+        setCurrentSection('metrics');
       }
     } catch (e) {
       // ignore
@@ -56,7 +57,7 @@ const Index = () => {
           <AnimatePresence mode="wait">
             {/* SECCIÓN 1: ANÁLISIS POR ID */}
             {currentSection === "metrics" && (
-              <AnalysisSection onSearchClick={() => setCurrentSection("search")} />
+              <AnalysisSection onSearchClick={() => setCurrentSection("search")} initialDatasetId={initialDatasetId} />
             )}
 
             {/* SECCIÓN 2: AGENTE DE IA */}

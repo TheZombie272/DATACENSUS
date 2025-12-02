@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MetricsDisplay } from "@/components/DataCensus/MetricsDisplay";
 import { QualityResults } from "@/types/dataQuality";
 import { toast } from "sonner";
@@ -10,9 +10,10 @@ import { API_BASE_URL, DEFAULT_DATASET_ID, DATOS_GOV_CO_BASE_URL } from "@/confi
 
 interface AnalysisSectionProps {
   onSearchClick: () => void;
+  initialDatasetId?: string | null;
 }
 
-export const AnalysisSection = ({ onSearchClick }: AnalysisSectionProps) => {
+export const AnalysisSection = ({ onSearchClick, initialDatasetId }: AnalysisSectionProps) => {
   const [loading, setLoading] = useState(false);
   const [initializing, setInitializing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -245,6 +246,15 @@ export const AnalysisSection = ({ onSearchClick }: AnalysisSectionProps) => {
       }
     }
   };
+
+  // If the parent provided an initialDatasetId via URL, start analysis automatically
+  useEffect(() => {
+    if (initialDatasetId && !analysisStarted) {
+      setDatasetInput(initialDatasetId);
+      void handleAnalyze(initialDatasetId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialDatasetId]);
 
   return (
     <motion.div
