@@ -28,7 +28,11 @@ const Index = () => {
     try {
       const params = new URLSearchParams(window.location.search);
       const embedFlag = params.get('embed');
+      const datasetId = params.get('dataset_id');
       if (embedFlag === '1' || embedFlag === 'true') setIsEmbedded(true);
+      // If there's a dataset_id in the URL, switch to the search section so the
+      // SearchAgentSection can auto-run the query on mount.
+      if (datasetId) setCurrentSection('search');
     } catch (e) {
       // ignore
     }
