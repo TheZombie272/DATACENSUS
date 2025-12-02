@@ -13,7 +13,7 @@ interface Message {
   content: string;
 }
 
-export const SearchAgentSection = () => {
+export const SearchAgentSection = ({ initialDatasetId }: { initialDatasetId?: string | null }) => {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -43,6 +43,13 @@ export const SearchAgentSection = () => {
       }, 150);
     }
   }, [iframeDatasetId]);
+
+  // If parent provides an initialDatasetId (from URL), open the iframe automatically
+  useEffect(() => {
+    if (initialDatasetId) {
+      setIframeDatasetId(initialDatasetId);
+    }
+  }, [initialDatasetId]);
 
   const handleSearch = async (message?: string) => {
     const msg = (typeof message === 'string' ? message : query).trim();

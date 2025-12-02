@@ -12,6 +12,8 @@ import { AboutSection } from "./sections/AboutSection";
 const Index = () => {
   const [currentSection, setCurrentSection] = useState<"metrics" | "search" | "global" | "about">("metrics");
   const [isEmbedded, setIsEmbedded] = useState(false);
+  // If the page is loaded with ?dataset_id=..., keep it so we can pass to the chat
+  const [initialDatasetId, setInitialDatasetId] = useState<string | null>(null);
 
   useEffect(() => {
     checkServerStatus().then(isActive => {
@@ -29,10 +31,13 @@ const Index = () => {
       const params = new URLSearchParams(window.location.search);
       const embedFlag = params.get('embed');
       if (embedFlag === '1' || embedFlag === 'true') setIsEmbedded(true);
-      // If the page is loaded with ?dataset_id=..., switch to the metrics
-      // section so the AnalysisSection can pick up the param and load it.
+      // If the page is loaded with ?dataset_id=..., open the chat
+      // and pass the id so the chat can show the dataset preview iframe.
       const datasetId = params.get('dataset_id');
-      if (datasetId) setCurrentSection('metrics');
+      if (datasetId) {
+        setInitialDatasetId(datasetId);
+        setCurrentSection('search');
+      }
     } catch (e) {
       // ignore
     }
@@ -56,7 +61,7 @@ const Index = () => {
 
             {/* SECCIÓN 2: AGENTE DE IA */}
             {currentSection === "search" && (
-              <SearchSection />
+              <SearchSection initialDatasetId={initialDatasetId} />
             )}
 
             {/* SECCIÓN 3: MÉTRICAS GENERALES */}
