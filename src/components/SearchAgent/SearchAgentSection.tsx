@@ -46,9 +46,8 @@ export const SearchAgentSection = ({ initialDatasetId }: { initialDatasetId?: st
 
   // If parent provides an initialDatasetId (from URL), open the iframe automatically
   useEffect(() => {
-    if (initialDatasetId) {
-      setIframeDatasetId(initialDatasetId);
-    }
+    // Removed auto-open behavior: the iframe should only open when the user
+    // explicitly clicks "Ver métricas" for an ID.
   }, [initialDatasetId]);
 
   const handleSearch = async (message?: string) => {
@@ -265,9 +264,8 @@ export const SearchAgentSection = ({ initialDatasetId }: { initialDatasetId?: st
                                 <div key={id} className="flex items-center gap-2">
                                   <button
                                     onClick={() => {
-                                      // Navigate to the metrics view with dataset_id in the URL
-                                      // This will load the AnalysisSection and trigger the ID-based analysis.
-                                      window.location.href = `${window.location.origin}/?dataset_id=${id}`;
+                                      // Open the iframe preview inside the chat for this dataset id.
+                                      setIframeDatasetId(id);
                                     }}
                                     className="inline-flex items-center gap-2 px-3 py-1 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-sm font-semibold"
                                   >

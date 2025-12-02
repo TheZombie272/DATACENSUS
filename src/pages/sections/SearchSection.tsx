@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { SearchAgentSection } from "@/components/SearchAgent/SearchAgentSection";
 
-export const SearchSection = ({ initialDatasetId }: { initialDatasetId?: string | null }) => {
+export const SearchSection = () => {
   return (
     <motion.div
       key="search-section"
@@ -11,7 +11,7 @@ export const SearchSection = ({ initialDatasetId }: { initialDatasetId?: string 
       transition={{ duration: 0.4 }}
       className="fixed inset-0 top-[72px] z-40 flex items-center justify-center p-4 md:p-6"
     >
-      <SearchAgentSection initialDatasetId={initialDatasetId} />
+      <SearchAgentSection />
     </motion.div>
   );
 };
